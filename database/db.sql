@@ -16,7 +16,7 @@ CREATE TABLE book(
     thumbnail_main BLOB DEFAULT NULL,
     thumbnail_secondary BLOB DEFAULT NULL,
     editorial VARCHAR(100) DEFAULT '',
-    sinopsis VARCHAR(500) DEFAULT '',
+    synopsis VARCHAR(500) DEFAULT '',
     genre VARCHAR NOT NULL DEFAULT 0,
     price VARCHAR(10) DEFAULT '',
     publication_date BIGINTEGER DEFAULT NULL,
