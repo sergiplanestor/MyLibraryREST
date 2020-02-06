@@ -3,6 +3,9 @@ const mariadb = require('mariadb');
 
 class AppDatabase {
 
+// =====================================================================================================================
+// Constructor
+// =====================================================================================================================
 
 	constructor() {
 		this.pool = mariadb.createPool({
@@ -14,6 +17,10 @@ class AppDatabase {
 			database: 'calturbo_db'
 		});
 	}
+
+// =====================================================================================================================
+// User methods
+// =====================================================================================================================
 
 	async insertUser(user) {
 		let query = "INSERT INTO user(username, pwd, creation_date) VALUES (?,?,?)";
@@ -45,6 +52,10 @@ class AppDatabase {
 		}
 		return null
 	}
+
+// =====================================================================================================================
+// Book methods
+// =====================================================================================================================
 
 	async insertBook(book) {
 
@@ -103,67 +114,6 @@ class AppDatabase {
 		}
 	}
 
-	async fetchIdOrInsertTag(tag) {
-		const storedTag = await this.fetchTagByName(tag);
-		if (storedTag) {
-			return storedTag._id;
-		} else {
-			return await this.insertTag(tag).catch(AppDatabase.errorHandler());
-		}
-	}
-
-	async insertTag(tag) {
-		const query = "INSERT INTO tag(tag) VALUES(?) RETURNING _id";
-		const values = [tag.tag];
-		return await this.execQuery(query, values).catch(AppDatabase.errorHandler());
-	}
-
-	async fetchTagByName(tag) {
-		const query = "SELECT _id, tag FROM tag WHERE tag = ? LIMIT 1";
-		const values = [tag.tag];
-		const queryResult = await this.execQuery(query, values).catch(AppDatabase.errorHandler());
-		if (queryResult && queryResult.length === 1) {
-			return queryResult[0];
-		}
-		return null;
-	}
-
-	async fetchTagById(id) {
-		const query = "SELECT _id, tag FROM tag WHERE _id = ?";
-		const values = [id];
-		const queryResult = await this.execQuery(query, values).catch(AppDatabase.errorHandler());
-		if (queryResult && queryResult.length === 1) {
-			return queryResult[0];
-		}
-		return null;
-	}
-
-	async fetchTagsBook(bookId) {
-		const query = "SELECT tag FROM book_tag WHERE book = ?";
-		const values = [bookId];
-		const queryResult = await this.execQuery(query, values).catch(AppDatabase.errorHandler());
-		if (queryResult) {
-			return queryResult;
-		}
-		return null;
-	}
-
-	async fetchTagsFromBook(bookId) {
-
-		const tagsId = await this.fetchTagsBook(bookId);
-		const result = [];
-		if (tagsId) {
-			for (let i = 0 ; i < tagsId ; i++) {
-				let tag = await this.fetchTagById(tagsId[i]);
-				if (tag) {
-					result.push(tag);
-				}
-			}
-			return result;
-		}
-		return null;
-	}
-
 	async fetchBooks(userId) {
 		let query =   "SELECT " +
 			"_id," +
@@ -219,6 +169,79 @@ class AppDatabase {
 		}
 	}
 
+// =====================================================================================================================
+// Tag methods
+// =====================================================================================================================
+
+	async insertTag(tag) {
+		const query = "INSERT INTO tag(tag) VALUES(?) RETURNING _id";
+		const values = [tag.tag];
+		return await this.execQuery(query, values).catch(AppDatabase.errorHandler());
+	}
+
+	async fetchTagsFromBook(bookId) {
+
+		const tagsId = await this.fetchTagsBook(bookId);
+		const result = [];
+		if (tagsId) {
+			for (let i = 0 ; i < tagsId ; i++) {
+				let tag = await this.fetchTagById(tagsId[i]);
+				if (tag) {
+					result.push(tag);
+				}
+			}
+			return result;
+		}
+		return null;
+	}
+
+	async fetchIdOrInsertTag(tag) {
+		const storedTag = await this.fetchTagByName(tag);
+		if (storedTag) {
+			return storedTag._id;
+		} else {
+			return await this.insertTag(tag).catch(AppDatabase.errorHandler());
+		}
+	}
+
+	async fetchTagByName(tag) {
+		const query = "SELECT _id, tag FROM tag WHERE tag = ? LIMIT 1";
+		const values = [tag.tag];
+		const queryResult = await this.execQuery(query, values).catch(AppDatabase.errorHandler());
+		if (queryResult && queryResult.length === 1) {
+			return queryResult[0];
+		}
+		return null;
+	}
+
+	async fetchTagById(id) {
+		const query = "SELECT _id, tag FROM tag WHERE _id = ?";
+		const values = [id];
+		const queryResult = await this.execQuery(query, values).catch(AppDatabase.errorHandler());
+		if (queryResult && queryResult.length === 1) {
+			return queryResult[0];
+		}
+		return null;
+	}
+
+// =====================================================================================================================
+// Book Tag methods
+// =====================================================================================================================
+
+	async fetchTagsBook(bookId) {
+		const query = "SELECT tag FROM book_tag WHERE book = ?";
+		const values = [bookId];
+		const queryResult = await this.execQuery(query, values).catch(AppDatabase.errorHandler());
+		if (queryResult) {
+			return queryResult;
+		}
+		return null;
+	}
+
+// =====================================================================================================================
+// Generic query executors
+// =====================================================================================================================
+
 	async execQuery(query, queryValues) {
 		let conn = await this.pool.getConnection();
 		let queryResult = await conn.query(query, queryValues);
@@ -231,6 +254,10 @@ class AppDatabase {
 		let result = await this.execQuery(query, queryValues).catch(AppDatabase.errorHandler);
 		return !!result['affectedRows'];
 	}
+
+// =====================================================================================================================
+// Static error handler
+// =====================================================================================================================
 
 	static errorHandler(error) {
 		return error;
