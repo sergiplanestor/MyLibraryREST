@@ -27,9 +27,9 @@ class AppDatabase {
 		if (user) {
 			const values = [
 				user.username,
-				new Buffer.from(user.pwd, "base64"),
+				new Buffer(user.pwd),
 				// TODO: creation_date
-			]
+			];
 			return await this.execInsert(query, values).catch(AppDatabase.errorHandler());
 		}
 		return false;
@@ -141,10 +141,10 @@ class AppDatabase {
 				item = queryResult[i];
 				tags = await this.fetchTagsFromBook(item._id).catch(AppDatabase.errorHandler());
 				if (item.thumbnail_main) {
-					item.thumbnail_main = item.thumbnail_main.toString("base64");
+					item.thumbnail_main = Buffer.from(item.thumbnail_main).toString('base64');
 				}
 				if (item.thumbnail_secondary) {
-					item.thumbnail_secondary = item.thumbnail_secondary.toString("base64");
+					item.thumbnail_secondary =Buffer.from(item.thumbnail_secondary).toString('base64');
 				}
 				result.push(
 					{
