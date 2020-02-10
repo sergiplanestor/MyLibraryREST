@@ -265,4 +265,4 @@ class AppDatabase {
 
 }
 
-module.exports = this;
+module.exports = AppDatabase;
