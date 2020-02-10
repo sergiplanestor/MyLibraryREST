@@ -1,0 +1,6 @@
+
+const RESOURCE_NOT_FOUND = "NTFND";
+const RESOURCE_INSERT_CONFLICT = "INSRTCNFLCT";
+const UNKNOWN_ERROR = "UNKNOWNERROR";
+
+module.exports = this;
