@@ -40,12 +40,17 @@ router.post('/register', async function(req, res) {
 		const _id = await db.insertUser(usr);
 
 		if (_id) {
+
 			//let token = generateDefaultToken();
 			res.status(200);
 			res.json({token: "token", id: _id});
+
 		} else {
 
 		}
+
+	} else {
+
 	}
 
 	// res.status(409);
