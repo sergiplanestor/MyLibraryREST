@@ -14,7 +14,7 @@ class AppDatabase {
 			port: 3306,
 			user: 'usr_library',
 			password: 'h$28be7;&shdH6ab?bB3k_DK',
-			database: 'calturbo_db'
+			database: 'mylibrary_db'
 		});
 	}
 
@@ -28,7 +28,7 @@ class AppDatabase {
 			const values = [
 				user.username,
 				new Buffer(user.pwd),
-				// TODO: creation_date
+				user.creation_date
 			];
 			return await this.execInsert(query, values).catch(AppDatabase.errorHandler());
 		}
